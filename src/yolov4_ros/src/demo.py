@@ -29,8 +29,8 @@ from cv_bridge import CvBridge, CvBridgeError
 """hyper parameters"""
 use_cuda = True
 
-cfgfile = 'yolo/yolov4.cfg'
-weightfile = 'yolo/yolov4.weights'
+cfgfile = '../models/yolov4.cfg'
+weightfile = '../models/yolov4.weights'
 m = Darknet(cfgfile)
 
 m.print_network()

@@ -106,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES yolov4_ros
-#  CATKIN_DEPENDS roscpp rospy sensor_msgs std_msgs
+ CATKIN_DEPENDS roscpp rospy sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 

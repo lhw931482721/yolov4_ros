@@ -2,6 +2,7 @@
 .vscode
 build
 devel
+logs
 src/yolov4_ros/yolov4
 src/yolov4_ros/weight
-src/yolov4_ros/src/yolo
+src/yolov4_ros/models
