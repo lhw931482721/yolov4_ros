@@ -57,8 +57,8 @@ class App:
         #     cv2.imshow('image-detected', cv_image)
         
         ros_image = self.bridge.cv2_to_imgmsg(cv_image)
-        ros_image.header.frame_id = "camera/front"
-        ros_image.header.stamp = rospy.Time.now()
+        ros_image.header.frame_id = image.header.frame_id
+        ros_image.header.stamp = image.header.stamp
         # rospy.loginfo("[image-light-detector] out image size: [{}, {}]".format(ros_image.width, ros_image.height))
         self.pub_image_detected.publish(ros_image)
         self.pre_time = rospy.Time.now()
