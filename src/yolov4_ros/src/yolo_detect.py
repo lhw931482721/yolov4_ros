@@ -34,6 +34,7 @@ class Detector:
         self.model = Darknet(cfgfile)
         self.model.load_weights(weightfile)
         if(use_cuda):
+            print("cuda ***************************************************")
             self.model.cuda()
         self.bridge = CvBridge()
         self.use_cuda = use_cuda
@@ -50,4 +51,4 @@ class Detector:
 
         img_plot = plot_boxes_cv2(image, boxes[0], class_names=self.class_names)
 
-        return img_plot
+        return img_plot,boxes

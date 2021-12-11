@@ -9,6 +9,8 @@ from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import yolo_detect
+from image_obj_msgs.msg import ImageObj
+from image_obj_msgs.msg import ImageBox
 
 
 
@@ -21,7 +23,6 @@ class App:
         # self.enable_floating_window = _enable_floating_window
         self.pre_time = rospy.Time.now()
         self.pre_rate = 0.0
-        self.r = rospy.Rate(10)
 
     def _init_params(self):
         self.sub_image_topic = rospy.get_param("~input_image_topic", default="/d400/color/image_raw")
@@ -33,10 +34,11 @@ class App:
         self.detector = yolo_detect.Detector(self.cfgfile,self.weightfile,self.namesfile,self.use_cuda)
 
     def _add_pub(self):
-        self.pub_image_detected = rospy.Publisher("/image/detected", Image, queue_size=5)
+        self.pub_image_detected = rospy.Publisher("/image/detected", Image, queue_size=1)
+        self.pub_image_obj = rospy.Publisher("/image/detected_obj", ImageObj, queue_size=1)
 
     def _add_sub(self):
-        rospy.Subscriber("/d400/color/image_raw", Image, self._cb_image, queue_size=1)
+        rospy.Subscriber("/d400/color/image_raw", Image, self._cb_image, queue_size=100)
 
     def run(self):
         self._init_params()
@@ -51,7 +53,7 @@ class App:
         except CvBridgeError as e:
             rospy.logwarn("Cannot convert ros image to cv image, err: {}".format(e))
             return
-        cv_image = self.detector.realtime_detect(cv_image)
+        cv_image,boxes = self.detector.realtime_detect(cv_image)
         # if self.enable_rate_info:
         #     time_now = rospy.Time.now()
         #     time_interval = (time_now - self.pre_time).to_sec()
@@ -71,21 +73,23 @@ class App:
         # rospy.loginfo("[image-light-detector] out image size: [{}, {}]".format(ros_image.width, ros_image.height))
         self.pub_image_detected.publish(ros_image)
         self.pre_time = rospy.Time.now()
-        self.r.sleep()
 
-    def _on_shutdown(self):
-        if self.enable_floating_window:
-            cv2.destroyAllWindows()
+        boxes_msg = ImageObj()
+        boxes_msg.header = image.header
 
-    def shutdown(self):
-        self._on_shutdown()
+        boxes_tmp = []
+        # print(boxes)
 
-    def __enter__(self):
-        return self
+        if(len(boxes[0])):
+            for i in range(len(boxes[0])):
+                box_msg = ImageBox()
+                box_msg.box = boxes[0][i]
+                boxes_tmp.append(box_msg)
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self._on_shutdown()
-        return exc_type, exc_val, exc_tb
+        boxes_msg.boxes = boxes_tmp
+
+        self.pub_image_obj.publish(boxes_msg)
+
 
 if __name__ == "__main__":
     # enable_floating_window = rospy.get_param("~enable_floating_window", default=True)
