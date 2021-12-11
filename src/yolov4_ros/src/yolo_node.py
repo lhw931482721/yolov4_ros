@@ -13,16 +13,24 @@ import yolo_detect
 
 
 class App:
-    def __init__(self,net):
+    def __init__(self):
         rospy.init_node('yolo_detector', log_level=rospy.INFO)
         self.bridge = CvBridge()
-        self.detector = net
+        self.detector = None
         # self.enable_rate_info = _enable_rate_info
         # self.enable_floating_window = _enable_floating_window
         self.pre_time = rospy.Time.now()
         self.pre_rate = 0.0
         self.r = rospy.Rate(10)
 
+    def _init_params(self):
+        self.sub_image_topic = rospy.get_param("~input_image_topic", default="/d400/color/image_raw")
+        self.cfgfile = rospy.get_param("~model_file", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/models/yolov4.cfg")
+        self.weightfile = rospy.get_param("~prototxt_file", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/models/yolov4.weights")
+        self.namesfile = rospy.get_param("~namesfile", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/data/coco.names")
+        self.use_cuda = rospy.get_param("~use_cuda", default=True)
+
+        self.detector = yolo_detect.Detector(self.cfgfile,self.weightfile,self.namesfile,self.use_cuda)
 
     def _add_pub(self):
         self.pub_image_detected = rospy.Publisher("/image/detected", Image, queue_size=5)
@@ -31,6 +39,7 @@ class App:
         rospy.Subscriber("/d400/color/image_raw", Image, self._cb_image, queue_size=1)
 
     def run(self):
+        self._init_params()
         self._add_pub()
         self._add_sub()
         rospy.spin()
@@ -81,14 +90,6 @@ class App:
 if __name__ == "__main__":
     # enable_floating_window = rospy.get_param("~enable_floating_window", default=True)
     # enable_rate_info = rospy.get_param("~enable_rate_info", default=True)
-    sub_image_topic = rospy.get_param("~input_image_topic", default="/d400/color/image_raw")
-    cfgfile = rospy.get_param("~model_file", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/models/yolov4.cfg")
-    weightfile = rospy.get_param("~prototxt_file", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/models/yolov4.weights")
-    namesfile = rospy.get_param("~namesfile", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/data/coco.names")
-    use_cuda = rospy.get_param("~use_cuda", default=True)
-
-    model = yolo_detect.Detector(cfgfile,weightfile,namesfile,use_cuda)
-
-    app = App(model)
+    app = App()
     app.run()
     
