@@ -9,6 +9,7 @@ from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import yolo_detect
+import yolo_detect_trt
 from image_obj_msgs.msg import ImageObj
 from image_obj_msgs.msg import ImageBox
 
@@ -27,11 +28,13 @@ class App:
     def _init_params(self):
         self.sub_image_topic = rospy.get_param("~input_image_topic", default="/d400/color/image_raw")
         self.cfgfile = rospy.get_param("~model_file", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/models/yolov4.cfg")
+        self.trtfile = rospy.get_param("~trt_file", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/models/yolov4.trt")
         self.weightfile = rospy.get_param("~prototxt_file", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/models/yolov4.weights")
         self.namesfile = rospy.get_param("~namesfile", default="/home/autoware/shared_dir/workspace/yolo_ws/src/yolov4_ros/data/coco.names")
         self.use_cuda = rospy.get_param("~use_cuda", default=True)
 
         self.detector = yolo_detect.Detector(self.cfgfile,self.weightfile,self.namesfile,self.use_cuda)
+        # self.detectortrt = yolo_detect_trt.Detector_trt(self.trtfile, self.namesfile, (416, 416))
 
     def _add_pub(self):
         self.pub_image_detected = rospy.Publisher("/image/detected", Image, queue_size=1)
@@ -53,7 +56,9 @@ class App:
         except CvBridgeError as e:
             rospy.logwarn("Cannot convert ros image to cv image, err: {}".format(e))
             return
-        cv_image,boxes = self.detector.realtime_detect(cv_image)
+        # boxes = self.detectortrt.realtime_detect(cv_image)
+        boxes = self.detector.realtime_detect(cv_image)
+
         # if self.enable_rate_info:
         #     time_now = rospy.Time.now()
         #     time_interval = (time_now - self.pre_time).to_sec()
@@ -65,13 +70,13 @@ class App:
         #     self.pre_rate = rate
         #     cv2.putText(cv_image, "FPS {:.2f}".format(rate), (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
         # if self.enable_floating_window:
-        #     cv2.imshow('image-detected', cv_image)
+        # cv2.imshow('image-detected', cv_image)
         
         ros_image = self.bridge.cv2_to_imgmsg(cv_image)
         ros_image.header.frame_id = image.header.frame_id
         ros_image.header.stamp = image.header.stamp
         # rospy.loginfo("[image-light-detector] out image size: [{}, {}]".format(ros_image.width, ros_image.height))
-        self.pub_image_detected.publish(ros_image)
+        # self.pub_image_detected.publish(ros_image)
         self.pre_time = rospy.Time.now()
 
         boxes_msg = ImageObj()
@@ -87,6 +92,8 @@ class App:
                 boxes_tmp.append(box_msg)
 
         boxes_msg.boxes = boxes_tmp
+        # print("/image/detected_obj")
+
 
         self.pub_image_obj.publish(boxes_msg)
 

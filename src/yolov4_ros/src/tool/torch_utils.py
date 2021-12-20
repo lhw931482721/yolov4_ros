@@ -73,7 +73,7 @@ def convert2cpu_long(gpu_matrix):
 
 
 
-def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1):
+def do_detect(model, img ,conf_thresh, nms_thresh, use_cuda=1):
     model.eval()
     t0 = time.time()
 
@@ -95,10 +95,10 @@ def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1):
 
     t2 = time.time()
 
-    print('-----------------------------------')
-    print('           Preprocess : %f' % (t1 - t0))
-    print('      Model Inference : %f' % (t2 - t1))
-    print('-----------------------------------')
+    # print('-----------------------------------')
+    # print('           Preprocess : %f' % (t1 - t0))
+    # print('      Model Inference : %f' % (t2 - t1))
+    # print('-----------------------------------')
 
     return utils.post_processing(img, conf_thresh, nms_thresh, output)
 

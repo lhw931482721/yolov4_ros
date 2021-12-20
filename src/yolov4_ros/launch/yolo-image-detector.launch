@@ -12,6 +12,7 @@
     <param name="model_file" value="$(find yolov4_ros)/models/yolov4.cfg"/>
     <param name="prototxt_file" value="$(find yolov4_ros)/models/yolov4.weights"/>
     <param name="namesfile" value="$(find yolov4_ros)/models/coco.names"/>
+    <param name="trt_file" value="$(find yolov4_ros)/models/yolov4.trt"/>
     <param name="use_cuda" value="true"/>
 
     <!-- Do remapping if needed -->
