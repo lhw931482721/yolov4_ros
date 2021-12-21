@@ -52,12 +52,12 @@ class Detector:
         img = image
         boxsrc = []
         for box in boxes[0]:
-            x1 = int(box[0] * width)
-            y1 = int(box[1] * height)
-            x2 = int(box[2] * width)
-            y2 = int(box[3] * height)
-            img = cv2.rectangle(img, (x1,y1), (x2, y2), (255, 0, 0), 1)
-            boxsrc.append([x1,y1,x2,y2,box[6]])
+            x1 =max( int(box[0] * width),0)
+            y1 = max(int(box[1] * height),0)
+            x2 = min(int(box[2] * width),width)
+            y2 = min(int(box[3] * height),height)
+            # img = cv2.rectangle(img, (x1,y1), (x2, y2), (255, 0, 0), 1)
+            boxsrc.append([x1,y1,x2,y2,box[4],box[5],box[6]])
         # # print(boxsrc)
         # # print(boxes)
         # # cv2.imshow('rectangle', img)
