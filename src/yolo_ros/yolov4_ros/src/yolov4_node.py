@@ -64,7 +64,7 @@ class Node():
         # callback = lambda msg: self.callback(msg, topic)
         # rospy.Subscriber('/cam0/image_raw', Image, callback)
         base_topic = '/'.join(topic.split('/')[:-1])
-        self.feature_publishers[topic] = rospy.Publisher( '/image/detected', ImageObj, queue_size=1)
+        self.feature_publishers[topic] = rospy.Publisher( '/image/detected_obj', ImageObj, queue_size=1)
         print(base_topic + '/features')
         self.stats[topic] = {'received': 0, 'processed': 0, 'last_time': None}
         with self.latest_msgs_lock:
