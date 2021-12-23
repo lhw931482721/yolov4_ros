@@ -9,7 +9,6 @@ from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import yolo_detect
-import yolo_detect_trt
 from image_obj_msgs.msg import ImageObj
 from image_obj_msgs.msg import ImageBox
 import time
