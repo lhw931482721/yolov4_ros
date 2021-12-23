@@ -126,10 +126,10 @@ class Node():
                 self.stats[topic]['received'] = 0
                 self.stats[topic]['processed'] = 0
                 self.stats[topic]['last_time'] = now
-            if received > 0:
-                rospy.loginfo(topic + ': processed %d out of %d in past %.1f sec (%.2f FPS)' % (processed, received, elapsed, processed / elapsed))
-            else:
-                rospy.loginfo(topic + ': no message received')
+            # if received > 0:
+            #     rospy.loginfo(topic + ': processed %d out of %d in past %.1f sec (%.2f FPS)' % (processed, received, elapsed, processed / elapsed))
+            # else:
+            #     rospy.loginfo(topic + ': no message received')
 
     def process(self, msg, topic):
         if msg.encoding == '8UC1' or msg.encoding == 'mono8':
@@ -153,15 +153,6 @@ class Node():
         res = {'features': boxes, 'header': msg.header, 'topic': topic, 'image': image}
         self.result_queue.put(res)
             # print(features)
-
-# def draw_keypoints(image, keypoints, scores):
-#     upper_score = 0.5
-#     lower_score = 0.1
-#     scale = 1 / (upper_score - lower_score)
-#     for p,s in zip(keypoints, scores):
-#         s = min(max(s - lower_score, 0) * scale, 1)
-#         color = (255 * (1 - s), 255 * (1 - s), 255) # BGR
-#         cv2.circle(image, tuple(p), 3, color, 2)
 
 def features_to_ros_msg(features, header):
     boxes_msg = ImageObj()
